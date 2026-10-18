@@ -1,10 +1,10 @@
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
 using Garage.Domain.Vehicles;
 
 namespace Garage.Domain;
 
+// stör mig på namnet... vad kan den heta annars
 public partial class GaragePlace
 {
   private Vehicle[] _vehicles;
@@ -93,6 +93,13 @@ public partial class GaragePlace
       WheresMyCar(vehicle.Type);
     }
   }
+
+  //eller ska den finnas i en serviceklass??
+  public Vehicle[] FindCars(string search)
+  {
+    return IsCarInGarage(search.ToUpper());
+  }
+
   private bool IsGarageFull(Vehicle vehicle)
   {
     if (string.IsNullOrWhiteSpace(vehicle.Id.ToString()))
@@ -123,5 +130,35 @@ public partial class GaragePlace
     }
 
     return false;
+  }
+
+  private Vehicle[] IsCarInGarage(string search)
+  {
+    Vehicle[] foundVehicles = [];
+    for (int i = 0; i < _vehicles.Length; i++)
+    {
+      Vehicle vehicle = _vehicles[i];
+
+      if (vehicle == null)
+      {
+        continue;
+      }
+
+      if (vehicle.LicensePlate == search ||
+          vehicle.Color == search ||
+          vehicle.Type.ToString().ToUpper() == search ||
+          vehicle.NumberOfWheels.ToString() == search)
+      {
+        Array.Resize(ref foundVehicles, foundVehicles.Length + 1);
+
+        // IDE rekommenderade 'use index operator'
+        // fick google:a [^1] vilket är sista elementet i arrayen, [^2] nästsista osv
+        // alltid lär man sig något nytt! :)
+        // foundVehicles[foundVehicles.Length - 1] = vehicle;
+        foundVehicles[^1] = vehicle;
+      }
+    }
+
+    return foundVehicles;
   }
 }

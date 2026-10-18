@@ -33,9 +33,9 @@ Det ska gå att:
 [x] Lägga till och ta bort fordon ur garaget  
 [x] Sätta en kapacitet (antal parkeringsplatser) vid instansieringen av ett nytt garage  
 [] Möjlighet att populera (sätta in bilar) i garaget med ett antal fordon från start.  
-[] Hitta ett specifikt fordon via registreringsnumret. Det ska fungera med både ABC123 
+[x] Hitta ett specifikt fordon via registreringsnumret. Det ska fungera med både ABC123 
 samt Abc123 eller AbC123.  
-[] Söka efter fordon utifrån en egenskap eller flera (alla möjliga kombinationer från 
+[x] Söka efter fordon utifrån en egenskap eller flera (alla möjliga kombinationer från 
 basklassen Vehicle). *Exempelvis: Alla svarta fordon med fyra hjul. Alla motorcyklar som är rosa och har 3 hjul. Alla lastbilar, Alla röda fordon.* 
 [x] Användaren ska få feedback på att saker gått bra eller dåligt. *Till exempel när vi parkerat ett fordon vill vi få en bekräftelse på att fordonet är parkerat. Om det inte går 
 vill användaren få veta varför.* 

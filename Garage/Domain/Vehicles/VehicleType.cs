@@ -1,4 +1,4 @@
-namespace Garage.Domain;
+namespace Garage.Domain.Vehicles;
 
 public enum VehicleType
 {
@@ -6,6 +6,5 @@ public enum VehicleType
   Motorcycle,
   Bus,
   Airplane,
-  Bicycle,
   Boat
 }

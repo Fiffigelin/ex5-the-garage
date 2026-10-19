@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Text.RegularExpressions;
 using Garage.ConsoleUtilities;
 using Garage.Domain.Garages;
@@ -11,36 +12,50 @@ public static class VehicleService
 {
   private const string LicensePlatePattern =
   @"^[A-HJ-NPR-UW-Z]{3}[0-9]{2}[0-9A-HJ-NPR-UW-Z]$";
-  public static Vehicle AddVehicle(ParkingFacility garage)
+  public static Vehicle AddVehicle(VehicleType type, ParkingFacility garage)
   {
-    string[] options = [
-      $"{VehicleConsole.PrintVehicleType(VehicleType.Car)} Car",
-      $"{VehicleConsole.PrintVehicleType(VehicleType.Bus)} Bus"
-    ];
-
-    int input = MenuConsole.MenuHandler(["", "Add vehicle to park", "Type of vehicle", ""], options);
-
-    if (input == -1)
-    {
-      return null!;
-    }
-
     string color = InputConsole.StringInput("Color: ");
     int numberOfWheels = InputConsole.IntInput("Number of wheels: ");
 
-    switch (input)
+    switch (type)
     {
-      case 0:
+      case VehicleType.Car:
         string carLicenseplate = LicenceInput("Licenseplate: ", garage);
         int numberOfDoors = InputConsole.IntInput("Number of doors: ");
         bool isElectric = InputConsole.TextToBool(["Is the vehicle electric?"], ["Yes", "No"]);
         return new Car(color, numberOfWheels, carLicenseplate, numberOfDoors, isElectric);
-      case 1:
+      case VehicleType.Bus:
         string busLicenseplate = LicenceInput("Licenseplate: ", garage);
         int numberOfSeats = InputConsole.IntInput("Number of seats: ");
         return new Bus(color, numberOfWheels, busLicenseplate, numberOfSeats);
       default:
         throw new ArgumentException("Could not add vehicle. Please try again!");
+    }
+  }
+
+  public static VehicleType? ChooseVehicleType()
+  {
+    string[] options = [
+      $"{VehicleConsole.PrintVehicleType(VehicleType.Car)} Car",
+      $"{VehicleConsole.PrintVehicleType(VehicleType.Bus)} Bus",
+      "Back"
+    ];
+
+    int input = MenuConsole.MenuHandler(["", "Park a Vehicle", "Type of vehicle", ""], options);
+
+    if (input == -1 || input == options.Length - 1)
+    {
+      return null!;
+    }
+
+    switch (input)
+    {
+      case 0:
+        return VehicleType.Car;
+      case 1:
+        return VehicleType.Bus;
+      default:
+        throw new ArgumentException("What are you trying to choose?");
     }
   }
 

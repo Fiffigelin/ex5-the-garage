@@ -1,11 +1,12 @@
 using System;
 using Garage.ConsoleUtilities;
-using Garage.Domain;
+using Garage.Domain.Garages;
 using Garage.Domain.Vehicles;
 using Garage.Service;
 
 internal class Program
 {
+  private static readonly FacilityData Facilities = new();
   // TODO
   // Gör det möjligt att kolla om ett parkeringshus har plats för fordon
   // se över hur många platser ett visst fordon tar upp 
@@ -14,12 +15,15 @@ internal class Program
     Car car1 = new("vit", 4, "abc123", 5, true);
     Car car2 = new("röd", 4, "bcd123", 5, false);
     Car car3 = new("blå", 4, "bcd12a", 5, false);
-    Car car4 = new("svart", 4, "efg456", 5, true);
-    GaragePlace garage = new("Centralt", 6);
+    ParkingFacility garage = new("Centralt", 6);
+    ParkingFacility garage1 = new("Öster", 6);
+    ParkingFacility garage2 = new("Väster", 6);
     garage.AddVehicle(car1);
     garage.AddVehicle(car2);
     garage.AddVehicle(car3);
-    garage.AddVehicle(car4);
+    Facilities.AddFacility(garage);
+    Facilities.AddFacility(garage1);
+    Facilities.AddFacility(garage2);
 
     car3.GetInfo();
 
@@ -27,13 +31,13 @@ internal class Program
     {
       string[] mainOptions =
       {
-         "Show all vehicles",
-         "Add vehicle",
-         "Remove vehicle",
+         "Show Parking Facilities",
+         "Park Vehicle",
+         "Remove Vehicle",
          "Exit"
      };
 
-      int choice = MenuConsole.MenuHandler(["Welcome to Elins parking solution", "Parky squeezy, nice and easy!\n"], mainOptions);
+      int choice = MenuConsole.MenuHandler(["Welcome to Elins Parking Solution", "Parky Squeezy, Nice and Easy!\n"], mainOptions);
 
       switch (choice)
       {
@@ -41,11 +45,11 @@ internal class Program
           Environment.Exit(0);
           break;
         case 0:
-          TableConsole.TableHandler(garage.Vehicles);
+          HandleParkingFacilities();
           break;
 
         case 1:
-          AddVehicle(garage);
+          ParkVehicle();
           break;
 
         case 2:
@@ -60,17 +64,51 @@ internal class Program
     }
   }
 
-  public static void AddVehicle(GaragePlace garage)
+  public static void HandleParkingFacilities()
   {
     TitleConsole.DisplayMainTitle();
     Console.WriteLine();
 
-    Vehicle vehicle = VehicleService.AddVehicle(garage);
-
-    if (vehicle is not null)
+    ParkingFacilityService.ViewFacilities(Facilities);
+  }
+  public static void ParkVehicle()
+  {
+    while (true)
     {
-      garage.AddVehicle(vehicle);
-      Console.ReadLine();
+      Console.Clear();
+      TitleConsole.DisplayMainTitle();
+      Console.WriteLine();
+
+      ParkingFacility[] facilities = Facilities.AvailableParking();
+
+      string[] options = new string[facilities.Length + 1];
+      for (int i = 0; i < facilities.Length; i++)
+      {
+        options[i] = Facilities.Garages[i].Name;
+      }
+      options[^1] = "Back";
+
+      int input = MenuConsole.MenuHandler(["\nChoose a Parking Facility"], options);
+
+      if (input == -1 || input == options.Length - 1)
+      {
+        return;
+      }
+
+      VehicleType? type = VehicleService.ChooseVehicleType();
+      if (type is null)
+      {
+        continue;
+      }
+
+      ParkingFacility parking = Facilities.Garages[input];
+      Vehicle vehicle = VehicleService.AddVehicle((VehicleType)type, parking);
+
+      if (vehicle is not null)
+      {
+        parking.AddVehicle(vehicle);
+        return;
+      }
     }
   }
 }

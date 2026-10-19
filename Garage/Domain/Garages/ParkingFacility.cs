@@ -2,10 +2,9 @@ using System;
 using System.Text.Json.Serialization;
 using Garage.Domain.Vehicles;
 
-namespace Garage.Domain;
+namespace Garage.Domain.Garages;
 
-// stör mig på namnet... vad kan den heta annars
-public partial class GaragePlace
+public partial class ParkingFacility
 {
   private Vehicle[] _vehicles;
   public Guid Id { get; }
@@ -29,7 +28,7 @@ public partial class GaragePlace
     }
   }
 
-  public GaragePlace(string name, int parkingLots)
+  public ParkingFacility(string name, int parkingLots)
   {
     if (string.IsNullOrWhiteSpace(name) || name.Length <= 2)
     {
@@ -48,7 +47,7 @@ public partial class GaragePlace
   }
 
   [JsonConstructor]
-  public GaragePlace(Guid id, string name, int parkingLots)
+  public ParkingFacility(Guid id, string name, int parkingLots)
   {
     if (string.IsNullOrWhiteSpace(name) || name.Length <= 2)
     {

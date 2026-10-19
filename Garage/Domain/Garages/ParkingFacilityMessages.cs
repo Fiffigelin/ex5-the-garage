@@ -2,9 +2,9 @@ using System;
 using Garage.ConsoleUtilities;
 using Garage.Domain.Vehicles;
 
-namespace Garage.Domain;
+namespace Garage.Domain.Garages;
 
-public partial class GaragePlace
+public partial class ParkingFacility
 {
   protected static void ParkingCar(VehicleType type)
   {

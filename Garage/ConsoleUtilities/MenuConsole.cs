@@ -8,7 +8,6 @@ public static class MenuConsole
   public static int MenuHandler(string[] previousTexts, string[] options)
   {
     int selectedIndex = 0;
-    ConsoleKey consoleKey;
 
     while (true)
     {
@@ -25,7 +24,7 @@ public static class MenuConsole
         if (i == selectedIndex)
         {
           Console.BackgroundColor = ConsoleColor.Blue;
-          Console.WriteLine($" > {options[i]} ");
+          Console.WriteLine($"> {options[i]} ");
           Console.ResetColor();
         }
         else
@@ -35,8 +34,7 @@ public static class MenuConsole
       }
 
       Console.WriteLine();
-      Console.WriteLine("Använd upp och nedpilarna.");
-      consoleKey = Console.ReadKey(true).Key;
+      ConsoleKey consoleKey = Console.ReadKey(true).Key;
 
       switch (consoleKey)
       {
@@ -58,11 +56,12 @@ public static class MenuConsole
           break;
         case ConsoleKey.Enter:
           return selectedIndex;
+        case ConsoleKey.Escape:
+          return -1;
         default:
           Console.WriteLine("Använd Enter för att välja.");
           break;
       }
-
     }
   }
 }

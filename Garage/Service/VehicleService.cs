@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 using Garage.ConsoleUtilities;
-using Garage.Domain;
+using Garage.Domain.Garages;
 using Garage.Domain.Vehicles;
 
 namespace Garage.Service;
@@ -11,7 +11,7 @@ public static class VehicleService
 {
   private const string LicensePlatePattern =
   @"^[A-HJ-NPR-UW-Z]{3}[0-9]{2}[0-9A-HJ-NPR-UW-Z]$";
-  public static Vehicle AddVehicle(GaragePlace garage)
+  public static Vehicle AddVehicle(ParkingFacility garage)
   {
     string[] options = [
       $"{VehicleConsole.PrintVehicleType(VehicleType.Car)} Car",
@@ -44,7 +44,7 @@ public static class VehicleService
     }
   }
 
-  private static string LicenceInput(string message, GaragePlace garage)
+  private static string LicenceInput(string message, ParkingFacility garage)
   {
     while (true)
     {
@@ -72,7 +72,7 @@ public static class VehicleService
 
   // lånat denna från klassen GaragePlace. Jag tänker mer på en serviceklass.
   // dvs om man sak kunna ha flera garage. Fundera lite mer på denna...
-  public static Vehicle[] SearchVehicle(string search, GaragePlace garage)
+  public static Vehicle[] SearchVehicle(string search, ParkingFacility garage)
   {
     Vehicle[] foundVehicles = [];
     for (int i = 0; i < garage.Vehicles.Length; i++)
@@ -94,31 +94,6 @@ public static class VehicleService
       }
     }
 
-    return foundVehicles;
-  }
-
-  // behöver fråga Michael om man ska kunna söka på "rö" och få alla röda fordon...
-  public static Vehicle[] ContainsSearch(string search, GaragePlace garage)
-  {
-    Vehicle[] foundVehicles = [];
-    for (int i = 0; i < garage.Vehicles.Length; i++)
-    {
-      Vehicle vehicle = garage.Vehicles[i];
-
-      if (vehicle == null)
-      {
-        continue;
-      }
-
-      if (vehicle.LicensePlate!.Contains(search) ||
-          vehicle.Color.Contains(search) ||
-          vehicle.Type.ToString().ToUpper().Contains(search) ||
-          vehicle.NumberOfWheels.ToString().Contains(search))
-      {
-        Array.Resize(ref foundVehicles, foundVehicles.Length + 1);
-        foundVehicles[^1] = vehicle;
-      }
-    }
     return foundVehicles;
   }
 }

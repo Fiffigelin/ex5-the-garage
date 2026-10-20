@@ -3,6 +3,7 @@ using Garage.Domain.Vehicles;
 
 namespace Garage.Domain.Garages;
 
+// jag var korkad nog att döpa projektet till Garage XD
 public class Garage
 {
   private readonly Vehicle?[] _vehicles;

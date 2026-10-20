@@ -3,29 +3,29 @@ using Garage.Domain.Vehicles;
 
 namespace Garage.Domain.Garages;
 
-public class FacilityData
+public class GarageData
 {
-  private ParkingFacility[] _facilities = [];
+  private Garage[] _garages = [];
 
-  public ParkingFacility[] Facilities
+  public Garage[] Garages
   {
     get
     {
-      return (ParkingFacility[])_facilities.Clone();
+      return (Garage[])_garages.Clone();
     }
   }
 
-  public void AddFacility(ParkingFacility facility)
+  public void AddFacility(Garage facility)
   {
     ArgumentNullException.ThrowIfNull(facility);
 
-    Array.Resize(ref _facilities, _facilities.Length + 1);
-    _facilities[^1] = facility;
+    Array.Resize(ref _garages, _garages.Length + 1);
+    _garages[^1] = facility;
   }
 
   public bool IsNameUnique(string name)
   {
-    foreach (ParkingFacility facility in _facilities)
+    foreach (Garage facility in _garages)
     {
       if (string.Equals(
         facility.Name,
@@ -40,11 +40,11 @@ public class FacilityData
     return true;
   }
 
-  public ParkingFacility[] AvailableParking()
+  public Garage[] AvailableParking()
   {
-    ParkingFacility[] available = [];
+    Garage[] available = [];
 
-    foreach (ParkingFacility pf in _facilities)
+    foreach (Garage pf in _garages)
     {
       if (!pf.IsFull)
       {
@@ -60,7 +60,7 @@ public class FacilityData
   {
     ArgumentException.ThrowIfNullOrWhiteSpace(license);
 
-    foreach (ParkingFacility pf in _facilities)
+    foreach (Garage pf in _garages)
     {
       Vehicle[] vehicles = pf.ParkedVehicles();
 

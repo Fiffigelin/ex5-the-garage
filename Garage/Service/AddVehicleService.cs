@@ -7,7 +7,7 @@ namespace Garage.Service;
 
 public static partial class VehicleService
 {
-  private static Vehicle CreateCar(string color, FacilityData data)
+  private static Vehicle CreateCar(string color, GarageData data)
   {
     int numberOfWheels = InputConsole.IntInput("Number of wheels: ");
     string licenseplate = InputConsole.LicenceInput("Licenseplate: ", data);
@@ -15,21 +15,21 @@ public static partial class VehicleService
     bool isElectric = InputConsole.TextToBool("Is the vehicle electric?");
     return new Car(color, numberOfWheels, licenseplate, numberOfDoors, isElectric);
   }
-  private static Vehicle CreateMotorcycle(string color, FacilityData data)
+  private static Vehicle CreateMotorcycle(string color, GarageData data)
   {
     int numberOfWheels = InputConsole.IntInput("Number of wheels: ");
     string licenseplate = InputConsole.LicenceInput("Licenseplate: ", data);
     bool hasSidecar = InputConsole.TextToBool("Has Sidecar:");
     return new Motorcycle(color, numberOfWheels, licenseplate, hasSidecar);
   }
-  private static Vehicle CreateBus(string color, FacilityData data)
+  private static Vehicle CreateBus(string color, GarageData data)
   {
     int numberOfWheels = InputConsole.IntInput("Number of wheels: ");
     string licenseplate = InputConsole.LicenceInput("Licenseplate: ", data);
     int numberOfSeats = InputConsole.IntInput("Number of seats: ");
     return new Bus(color, numberOfWheels, licenseplate, numberOfSeats);
   }
-  private static Vehicle CreateAirplane(string color, FacilityData data)
+  private static Vehicle CreateAirplane(string color, GarageData data)
   {
     int numberOfWheels = InputConsole.IntInput("Number of wheels: ");
     string licenseplate = InputConsole.LicenceInput("Licenseplate: ", data);

@@ -11,21 +11,83 @@ public static partial class VehicleService
 {
 
   // En träff i sökningen: fordonet och parkeringshuset det står i.
-  public sealed record VehicleSearchResult(ParkingFacility Facility, Vehicle Vehicle);
-  public static Vehicle AddVehicle(VehicleType type, FacilityData data)
+  public sealed record VehicleSearchResult(Domain.Garages.Garage Garage, Vehicle Vehicle);
+  public static void ParkVehicle(GarageData data)
+  {
+    while (true)
+    {
+      Console.Clear();
+      TitleConsole.DisplayMainTitle();
+      Console.WriteLine();
+
+      Domain.Garages.Garage[] garages = data.AvailableParking();
+
+      string[] options = new string[garages.Length + 1];
+      for (int i = 0; i < garages.Length; i++)
+      {
+        options[i] = garages[i].Name;
+      }
+      options[^1] = "Back";
+
+      int input = MenuConsole.MenuHandler(["\nChoose a Parking Facility"], options);
+
+      if (input == -1 || input == options.Length - 1)
+      {
+        return;
+      }
+
+      VehicleType? type = VehicleConsole.ChooseVehicleType();
+      if (type is null)
+      {
+        continue;
+      }
+
+      Domain.Garages.Garage parking = garages[input];
+      Vehicle? vehicle;
+
+      try
+      {
+        vehicle = AddVehicle((VehicleType)type, data);
+      }
+      catch (ArgumentException ex)
+      {
+        Console.WriteLine($"Could not create the vehicle: {ex.Message}");
+        Console.WriteLine("Press any key to try again...");
+        Console.ReadKey(true);
+        continue;
+      }
+
+      bool parked = parking.AddVehicle(vehicle);
+
+      if (parked)
+      {
+        ParkingMessageConsole.ParkingCar(vehicle.Type);
+      }
+      else
+      {
+        ParkingMessageConsole.NoMoreLots(vehicle.Type);
+      }
+
+      Console.WriteLine("Press any key to continue...");
+      Console.ReadKey(true);
+      return;
+    }
+  }
+
+  public static Vehicle AddVehicle(VehicleType type, GarageData garage)
   {
     string color = InputConsole.StringInput("Color: ");
 
     switch (type)
     {
       case VehicleType.Car:
-        return CreateCar(color, data);
+        return CreateCar(color, garage);
       case VehicleType.Motorcycle:
-        return CreateMotorcycle(color, data);
+        return CreateMotorcycle(color, garage);
       case VehicleType.Bus:
-        return CreateBus(color, data);
+        return CreateBus(color, garage);
       case VehicleType.Airplane:
-        return CreateAirplane(color, data);
+        return CreateAirplane(color, garage);
       case VehicleType.Boat:
         return CreateBoat(color);
       default:
@@ -33,7 +95,7 @@ public static partial class VehicleService
     }
   }
 
-  public static void SearchVehicles(FacilityData data)
+  public static void SearchVehicles(GarageData data)
   {
     Console.Clear();
     TitleConsole.DisplayMainTitle();
@@ -51,12 +113,12 @@ public static partial class VehicleService
   }
 
   // söker i enskilt parkeringshus
-  private static Vehicle[] SearchVehicle(SearchVehicle search, ParkingFacility facility)
+  private static Vehicle[] SearchVehicle(SearchVehicle search, Domain.Garages.Garage garage)
   {
     ArgumentNullException.ThrowIfNull(search);
-    ArgumentNullException.ThrowIfNull(facility);
+    ArgumentNullException.ThrowIfNull(garage);
 
-    Vehicle?[] vehicles = facility.Vehicles;
+    Vehicle?[] vehicles = garage.Vehicles;
     Vehicle[] results = new Vehicle[vehicles.Length];
     int count = 0;
 
@@ -80,14 +142,14 @@ public static partial class VehicleService
   // Söker i ALLA parkeringshus och berättar även vilket hus fordonet står i.
   private static VehicleSearchResult[] SearchVehicle(
       SearchVehicle filter,
-      FacilityData data)
+      GarageData data)
   {
     ArgumentNullException.ThrowIfNull(filter);
     ArgumentNullException.ThrowIfNull(data);
 
     VehicleSearchResult[] hits = [];
 
-    foreach (ParkingFacility facility in data.Facilities)
+    foreach (Domain.Garages.Garage facility in data.Garages)
     {
       Vehicle[] vehicles = SearchVehicle(filter, facility);
 

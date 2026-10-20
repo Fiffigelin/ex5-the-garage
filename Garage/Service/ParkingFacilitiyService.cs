@@ -7,14 +7,22 @@ namespace Garage.Service;
 
 public static class ParkingFacilityService
 {
-  public static void ViewFacilities(FacilityData data)
+  public static void HandleParkingFacilities(GarageData garages)
+  {
+    TitleConsole.DisplayMainTitle();
+    Console.WriteLine();
+
+    ViewFacilities(garages);
+  }
+
+  public static void ViewFacilities(GarageData data)
   {
     while (true)
     {
-      ParkingFacility[] facilities = data.Facilities;
+      Domain.Garages.Garage[] facilities = data.Garages;
       string[] options = ["Add New Parking Facility"];
 
-      foreach (ParkingFacility facility in facilities)
+      foreach (Domain.Garages.Garage facility in facilities)
       {
         Array.Resize(ref options, options.Length + 1);
         options[^1] = facility.Name;
@@ -39,7 +47,7 @@ public static class ParkingFacilityService
     }
   }
 
-  private static void AddNewParkingFacility(FacilityData data)
+  private static void AddNewParkingFacility(GarageData data)
   {
     TitleConsole.DisplayMainTitle();
     Console.WriteLine("Add New Parking Facility\n");
@@ -49,7 +57,7 @@ public static class ParkingFacilityService
 
     try
     {
-      data.AddFacility(new ParkingFacility(facilityName, parkingLots));
+      data.AddFacility(new Domain.Garages.Garage(facilityName, parkingLots));
       Console.WriteLine($"\nParking facility '{facilityName}' has been added with {parkingLots} lots");
     }
     catch (ArgumentException ex)

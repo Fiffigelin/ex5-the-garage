@@ -3,7 +3,7 @@ using Garage.Domain.Vehicles;
 
 namespace Garage.Domain.Garages;
 
-public class ParkingFacility
+public class Garage
 {
   private readonly Vehicle?[] _vehicles;
   public Guid Id { get; }
@@ -21,7 +21,7 @@ public class ParkingFacility
   public const int MaxParkingLots = 200;
   public const int MinNameLength = 3;
 
-  public ParkingFacility(string name, int parkingLots)
+  public Garage(string name, int parkingLots)
   {
     if (string.IsNullOrWhiteSpace(name) || name.Length < MinNameLength)
     {

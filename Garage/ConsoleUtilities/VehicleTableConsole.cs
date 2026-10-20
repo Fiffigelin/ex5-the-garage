@@ -8,7 +8,7 @@ namespace Garage.ConsoleUtilities;
 
 public static class VehicleTableConsole
 {
-  public static void ViewVehiclesTable(ParkingFacility facility)
+  public static void ViewVehiclesTable(Domain.Garages.Garage facility)
   {
     int[] columnWidths = [1, 12, 12, 10, 10];
     string[] columnHeader = ["", "License", "Type", "Color", "Wheels"];
@@ -72,7 +72,7 @@ public static class VehicleTableConsole
             result,
             [
                 "",
-                result.Facility.Name,
+                result.Garage.Name,
                 result.Vehicle.LicensePlate?.Length > 0 ? result.Vehicle.LicensePlate : "",
                 result.Vehicle.Type.ToString(),
                 result.Vehicle.Color.ToString(),
@@ -81,7 +81,7 @@ public static class VehicleTableConsole
             columnWidths,
             () => ViewVehicleInformation(
                 result.Vehicle,
-                result.Facility)
+                result.Garage)
         );
 
         vehicles[i] = result.Vehicle;
@@ -91,7 +91,7 @@ public static class VehicleTableConsole
     GenericTableConsole.PrintTable(() => header, columnHeader, columnWidths, rows, () => [""]);
   }
 
-  private static bool ViewVehicleInformation(Vehicle vehicle, ParkingFacility facility)
+  private static bool ViewVehicleInformation(Vehicle vehicle, Domain.Garages.Garage facility)
   {
     string[] options = ["Exit Parking", "Back"];
 
@@ -148,7 +148,7 @@ public static class VehicleTableConsole
     return sum;
   }
 
-  private static Vehicle[] GetParkedVehicles(ParkingFacility facility)
+  private static Vehicle[] GetParkedVehicles(Domain.Garages.Garage facility)
   {
     Vehicle?[] allVehicles = facility.Vehicles;
     Vehicle[] parkedVehicles = new Vehicle[facility.CountParkedVehicles()];

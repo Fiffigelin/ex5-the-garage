@@ -90,7 +90,7 @@ public static class InputConsole
     }
   }
 
-  public static string LicenceInput(string message, FacilityData data)
+  public static string LicenceInput(string message, GarageData data)
   {
     while (true)
     {
@@ -123,7 +123,7 @@ public static class InputConsole
     }
   }
 
-  public static string FacilityNameInput(string message, FacilityData data)
+  public static string FacilityNameInput(string message, GarageData data)
   {
     while (true)
     {

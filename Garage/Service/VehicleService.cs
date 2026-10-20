@@ -12,7 +12,7 @@ public static class VehicleService
 {
   private const string LicensePlatePattern =
   @"^[A-HJ-NPR-UW-Z]{3}[0-9]{2}[0-9A-HJ-NPR-UW-Z]$";
-  public static Vehicle AddVehicle(VehicleType type, ParkingFacility garage)
+  public static Vehicle AddVehicle(VehicleType type, FacilityData data)
   {
     string color = InputConsole.StringInput("Color: ");
     int numberOfWheels = InputConsole.IntInput("Number of wheels: ");
@@ -20,12 +20,12 @@ public static class VehicleService
     switch (type)
     {
       case VehicleType.Car:
-        string carLicenseplate = LicenceInput("Licenseplate: ", garage);
+        string carLicenseplate = LicenceInput("Licenseplate: ", data);
         int numberOfDoors = InputConsole.IntInput("Number of doors: ");
         bool isElectric = InputConsole.TextToBool(["Is the vehicle electric?"], ["Yes", "No"]);
         return new Car(color, numberOfWheels, carLicenseplate, numberOfDoors, isElectric);
       case VehicleType.Bus:
-        string busLicenseplate = LicenceInput("Licenseplate: ", garage);
+        string busLicenseplate = LicenceInput("Licenseplate: ", data);
         int numberOfSeats = InputConsole.IntInput("Number of seats: ");
         return new Bus(color, numberOfWheels, busLicenseplate, numberOfSeats);
       default:
@@ -59,7 +59,7 @@ public static class VehicleService
     }
   }
 
-  private static string LicenceInput(string message, ParkingFacility garage)
+  private static string LicenceInput(string message, FacilityData data)
   {
     while (true)
     {
@@ -73,9 +73,9 @@ public static class VehicleService
       }
 
       input = input.Trim().ToUpper();
-      Vehicle[] vehicles = SearchVehicle(input, garage);
+      bool isUnique = data.IsLicenseplateUnique(input);
 
-      if (vehicles.Length == 0 &&
+      if (isUnique &&
           Regex.IsMatch(input, LicensePlatePattern))
       {
         return input;

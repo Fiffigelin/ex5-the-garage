@@ -84,7 +84,7 @@ internal class Program
       string[] options = new string[facilities.Length + 1];
       for (int i = 0; i < facilities.Length; i++)
       {
-        options[i] = Facilities.Garages[i].Name;
+        options[i] = facilities[i].Name;
       }
       options[^1] = "Back";
 
@@ -101,12 +101,13 @@ internal class Program
         continue;
       }
 
-      ParkingFacility parking = Facilities.Garages[input];
-      Vehicle vehicle = VehicleService.AddVehicle((VehicleType)type, parking);
+      ParkingFacility parking = facilities[input];
+      Vehicle vehicle = VehicleService.AddVehicle((VehicleType)type, Facilities);
 
       if (vehicle is not null)
       {
         parking.AddVehicle(vehicle);
+        Console.ReadLine();
         return;
       }
     }

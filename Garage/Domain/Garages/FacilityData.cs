@@ -28,6 +28,11 @@ public class FacilityData
     return AvailableParkingFacilites();
   }
 
+  public bool IsLicenseplateUnique(string license)
+  {
+    return IsLicenseAvailable(license);
+  }
+
   private bool IsNameInArray(string name)
   {
     return _garages.Any(garage => string.Equals(garage.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -57,6 +62,22 @@ public class FacilityData
       }
     }
     return park;
+  }
+
+  private bool IsLicenseAvailable(string license)
+  {
+    foreach (ParkingFacility park in _garages)
+    {
+      foreach (Vehicle vh in park.Vehicles)
+      {
+        if (vh is not null && vh.LicensePlate == license.ToUpper())
+        {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 }
 

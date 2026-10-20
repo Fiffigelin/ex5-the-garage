@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http.Headers;
 using Garage.Domain.Garages;
 using Garage.Domain.Vehicles;
@@ -103,11 +104,8 @@ public static class TableConsole
           }
 
           Vehicle data = rows[selectedIndex].Data;
-          data.GetInfo();
-
-          Console.WriteLine("\nReturn to table with 'Enter'.");
-          Console.ReadLine();
-          break;
+          rows = ViewVehicleInformation(data, facility);
+          continue;
         case ConsoleKey.Escape:
           return;
         default:
@@ -172,5 +170,26 @@ public static class TableConsole
     int airplanes = vehicles.Count(v => v.Type == VehicleType.Airplane);
     int boats = vehicles.Count(v => v.Type == VehicleType.Boat);
     Console.WriteLine($"{VehicleConsole.PrintVehicleType(VehicleType.Car)} : {cars} | {VehicleConsole.PrintVehicleType(VehicleType.Bus)} : {busses} | {VehicleConsole.PrintVehicleType(VehicleType.Motorcycle)} : {motorcycles} | {VehicleConsole.PrintVehicleType(VehicleType.Airplane)} : {airplanes} | {VehicleConsole.PrintVehicleType(VehicleType.Boat)} : {boats}");
+  }
+
+  private static TableRow[] ViewVehicleInformation(Vehicle vehicle, ParkingFacility facility)
+  {
+    int[] widths = [3, 12, 12, 10, 10]; // dessa ska inte vara hårdkodat
+    string[] options = ["Exit Parking", "Back"];
+
+    int input = MenuConsole.MenuHandler(["", vehicle.GetInfo()], options);
+
+    switch (input)
+    {
+      case 0:
+        facility.RemoveVehicle(vehicle);
+        Console.ReadLine();
+        break;
+      case 1:
+        break;
+      default:
+        break;
+    }
+    return CreateVehicleRow(facility.Vehicles, widths);
   }
 }

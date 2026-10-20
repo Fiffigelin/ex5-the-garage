@@ -46,15 +46,13 @@ public abstract class Vehicle
     NumberOfWheels = type == VehicleType.Boat ? 0 : numberOfWheels;
     LicensePlate = licensePlate?.ToUpper();
   }
-  public virtual void GetInfo()
+  public virtual string GetInfo()
   {
-    Console.WriteLine($"License Plate: {LicensePlate}");
-    Console.WriteLine($"Type: {Type}");
-    Console.WriteLine($"Color: {Color}");
-
-    if (NumberOfWheels > 0)
-    {
-      Console.WriteLine($"Wheels: {NumberOfWheels}");
-    }
+    return
+    $"{(string.IsNullOrWhiteSpace(LicensePlate) ? "" : $"License plate: {LicensePlate}\n")}" +
+    $"Type: {Type}\n" +
+    $"Color: {Color}" +
+    $"{(NumberOfWheels > 0 ? $"\nWheels: {NumberOfWheels}" : "")}";
   }
 }
+

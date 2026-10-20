@@ -17,9 +17,10 @@ public class Bus : Vehicle
     NumberOfSeats = numberOfSeats;
   }
 
-  public override void GetInfo()
+  public override string GetInfo()
   {
-    base.GetInfo();
-    Console.WriteLine($"Amount of seats: {NumberOfSeats}");
+    string info = base.GetInfo();
+    return info +
+      $"Amount of seats: {NumberOfSeats}";
   }
 }

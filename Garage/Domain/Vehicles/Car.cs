@@ -36,11 +36,13 @@ public class Car : Vehicle
     IsElectric = isElectric;
   }
 
-  public override void GetInfo()
+  public override string GetInfo()
   {
     string boolString = IsElectric ? "Yes" : "No";
-    base.GetInfo();
-    Console.WriteLine($"Amount of doors: {NumberOfDoors}");
-    Console.WriteLine($"Electric car: {boolString}");
+    string info = base.GetInfo();
+
+    return info +
+    $"\nAmount of doors: {NumberOfDoors}" +
+    $"\nElectric: {boolString}";
   }
 }

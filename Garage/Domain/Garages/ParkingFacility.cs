@@ -95,11 +95,24 @@ public partial class ParkingFacility
     }
   }
 
-  //eller ska den finnas i en serviceklass??
-  // public Vehicle[] FindCars(string search)
-  // {
-  //   return IsCarInGarage(search.ToUpper());
-  // }
+  public int ParkedCars()
+  {
+    return CalculateParkedCars();
+  }
+
+  private int CalculateParkedCars()
+  {
+    int sum = 0;
+    foreach (Vehicle v in _vehicles)
+    {
+      if (v is not null)
+      {
+        sum++;
+      }
+    }
+
+    return sum;
+  }
 
   private bool IsGarageFull(Vehicle vehicle)
   {

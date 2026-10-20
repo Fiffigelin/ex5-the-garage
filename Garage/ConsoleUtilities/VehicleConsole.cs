@@ -23,4 +23,52 @@ public static class VehicleConsole
         return "⚠️";
     }
   }
+
+  public static VehicleType? ChooseVehicleTypeFilter()
+  {
+    VehicleType[] types = Enum.GetValues<VehicleType>();
+
+    string[] options = new string[types.Length + 1];
+    options[0] = "Any type";
+
+    for (int i = 0; i < types.Length; i++)
+    {
+      options[i + 1] = $"{PrintVehicleType(types[i])} {types[i]}";
+    }
+
+    int input = MenuConsole.MenuHandler(["", "Search vehicles", "Type of vehicle", ""], options);
+
+    if (input <= 0)
+    {
+      return null;
+    }
+
+    return types[input - 1];
+  }
+
+  public static VehicleType? ChooseVehicleType()
+  {
+    string[] options = [
+      $"{PrintVehicleType(VehicleType.Car)} Car",
+      $"{PrintVehicleType(VehicleType.Bus)} Bus",
+      "Back"
+    ];
+
+    int input = MenuConsole.MenuHandler(["", "Park a Vehicle", "Type of vehicle", ""], options);
+
+    if (input == -1 || input == options.Length - 1)
+    {
+      return null!;
+    }
+
+    switch (input)
+    {
+      case 0:
+        return VehicleType.Car;
+      case 1:
+        return VehicleType.Bus;
+      default:
+        throw new ArgumentException("What are you trying to choose?");
+    }
+  }
 }

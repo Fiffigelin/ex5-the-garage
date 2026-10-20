@@ -1,17 +1,17 @@
 using System;
-using System.Net;
-using System.Text.RegularExpressions;
 using Garage.ConsoleUtilities;
 using Garage.Domain.Garages;
+using Garage.Domain.General;
 using Garage.Domain.Vehicles;
 
 namespace Garage.Service;
 
 
-public static class VehicleService
+public static partial class VehicleService
 {
-  private const string LicensePlatePattern =
-  @"^[A-HJ-NPR-UW-Z]{3}[0-9]{2}[0-9A-HJ-NPR-UW-Z]$";
+
+  // En träff i sökningen: fordonet och parkeringshuset det står i.
+  public sealed record VehicleSearchResult(ParkingFacility Facility, Vehicle Vehicle);
   public static Vehicle AddVehicle(VehicleType type, FacilityData data)
   {
     string color = InputConsole.StringInput("Color: ");
@@ -20,95 +20,77 @@ public static class VehicleService
     switch (type)
     {
       case VehicleType.Car:
-        string carLicenseplate = LicenceInput("Licenseplate: ", data);
-        int numberOfDoors = InputConsole.IntInput("Number of doors: ");
-        bool isElectric = InputConsole.TextToBool(["Is the vehicle electric?"], ["Yes", "No"]);
-        return new Car(color, numberOfWheels, carLicenseplate, numberOfDoors, isElectric);
+        return CreateCar(color, numberOfWheels, data);
       case VehicleType.Bus:
-        string busLicenseplate = LicenceInput("Licenseplate: ", data);
-        int numberOfSeats = InputConsole.IntInput("Number of seats: ");
-        return new Bus(color, numberOfWheels, busLicenseplate, numberOfSeats);
+        return CreateBus(color, numberOfWheels, data);
       default:
         throw new ArgumentException("Could not add vehicle. Please try again!");
     }
   }
 
-  public static VehicleType? ChooseVehicleType()
+  public static void SearchVehicles(FacilityData data)
   {
-    string[] options = [
-      $"{VehicleConsole.PrintVehicleType(VehicleType.Car)} Car",
-      $"{VehicleConsole.PrintVehicleType(VehicleType.Bus)} Bus",
-      "Back"
-    ];
+    Console.Clear();
+    TitleConsole.DisplayMainTitle();
+    Console.WriteLine("\nSearch vehicles - leave a field empty to skip it.\n");
 
-    int input = MenuConsole.MenuHandler(["", "Park a Vehicle", "Type of vehicle", ""], options);
+    string? licensePlate = InputConsole.OptionalStringInput("License plate: ");
+    string? color = InputConsole.OptionalStringInput("Color: ");
+    int? numberOfWheels = InputConsole.OptionalIntInput("Number of wheels: ");
+    VehicleType? type = VehicleConsole.ChooseVehicleTypeFilter();
 
-    if (input == -1 || input == options.Length - 1)
-    {
-      return null!;
-    }
+    SearchVehicle filter = new(licensePlate, color, numberOfWheels, type);
+    VehicleSearchResult[] results = SearchVehicle(filter, data);
 
-    switch (input)
-    {
-      case 0:
-        return VehicleType.Car;
-      case 1:
-        return VehicleType.Bus;
-      default:
-        throw new ArgumentException("What are you trying to choose?");
-    }
+    VehicleTableConsole.ViewSearchTable(results);
   }
 
-  private static string LicenceInput(string message, FacilityData data)
+  // söker i enskilt parkeringshus
+  private static Vehicle[] SearchVehicle(SearchVehicle search, ParkingFacility facility)
   {
-    while (true)
+    ArgumentNullException.ThrowIfNull(search);
+    ArgumentNullException.ThrowIfNull(facility);
+
+    Vehicle[] vehicles = facility.Vehicles;
+    Vehicle[] results = new Vehicle[vehicles.Length];
+    int count = 0;
+
+    for (int i = 0; i < vehicles.Length; i++)
     {
-      Console.Write(message);
-      string? input = Console.ReadLine();
-
-      if (string.IsNullOrWhiteSpace(input))
+      if (vehicles[i] is not null && search.Matches(vehicles[i]))
       {
-        Console.WriteLine("You have to insert a licenseplate. Please try again!");
-        continue;
+        results[count] = vehicles[i];
+        count++;
       }
-
-      input = input.Trim().ToUpper();
-      bool isUnique = data.IsLicenseplateUnique(input);
-
-      if (isUnique &&
-          Regex.IsMatch(input, LicensePlatePattern))
-      {
-        return input;
-      }
-
-      Console.WriteLine("You have to insert a licenseplate. Please try again!");
     }
+
+    Vehicle[] matches = new Vehicle[count];
+    Array.Copy(results, matches, count);
+
+    return matches;
   }
 
-  // lånat denna från klassen GaragePlace. Jag tänker mer på en serviceklass.
-  // dvs om man sak kunna ha flera garage. Fundera lite mer på denna...
-  public static Vehicle[] SearchVehicle(string search, ParkingFacility garage)
+  // Söker i ALLA parkeringshus och berättar även vilket hus fordonet står i.
+  private static VehicleSearchResult[] SearchVehicle(
+      SearchVehicle filter,
+      FacilityData data)
   {
-    Vehicle[] foundVehicles = [];
-    for (int i = 0; i < garage.Vehicles.Length; i++)
+    ArgumentNullException.ThrowIfNull(filter);
+    ArgumentNullException.ThrowIfNull(data);
+
+    VehicleSearchResult[] hits = [];
+
+    foreach (ParkingFacility facility in data.Garages)
     {
-      Vehicle vehicle = garage.Vehicles[i];
+      Vehicle[] vehicles = SearchVehicle(filter, facility);
 
-      if (vehicle == null)
+      foreach (Vehicle vehicle in vehicles)
       {
-        continue;
-      }
-
-      if (vehicle.LicensePlate == search ||
-          vehicle.Color == search ||
-          vehicle.Type.ToString().ToUpper() == search ||
-          vehicle.NumberOfWheels.ToString() == search)
-      {
-        Array.Resize(ref foundVehicles, foundVehicles.Length + 1);
-        foundVehicles[^1] = vehicle;
+        Array.Resize(ref hits, hits.Length + 1);
+        hits[^1] = new VehicleSearchResult(facility, vehicle);
       }
     }
 
-    return foundVehicles;
+    return hits;
   }
 }

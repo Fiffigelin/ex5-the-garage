@@ -34,6 +34,7 @@ internal class Program
          "Show Parking Facilities",
          "Park Vehicle",
          "Remove Vehicle",
+         "Search Vehicles",
          "Exit"
      };
 
@@ -47,17 +48,17 @@ internal class Program
         case 0:
           HandleParkingFacilities();
           break;
-
         case 1:
           ParkVehicle();
           break;
-
         case 2:
           Console.WriteLine("Removing vehicle...");
           Console.ReadKey();
           break;
-
         case 3:
+          VehicleService.SearchVehicles(Facilities);
+          break;
+        case 4:
           Environment.Exit(0);
           break;
       }
@@ -95,7 +96,7 @@ internal class Program
         return;
       }
 
-      VehicleType? type = VehicleService.ChooseVehicleType();
+      VehicleType? type = VehicleConsole.ChooseVehicleType();
       if (type is null)
       {
         continue;

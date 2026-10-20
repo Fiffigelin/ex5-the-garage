@@ -1,4 +1,6 @@
 using System;
+using System.Data;
+using Garage.Domain.Vehicles;
 
 namespace Garage.ConsoleUtilities;
 
@@ -6,10 +8,10 @@ public class RowData<T> where T : class
 {
   public T Data { get; }
   public string Row { get; }
-  public Action? OnSelect { get; }
+  public Func<bool> OnSelect { get; }
 
   public RowData(
-    T data, string row, Action? onSelect = null)
+    T data, string row, Func<bool> onSelect)
   {
     Data = data;
     Row = row;
@@ -29,12 +31,12 @@ public static class GenericTable
       TitleConsole.DisplayMainTitle();
       Console.WriteLine();
 
-      Console.WriteLine(line);
       foreach (string s in header)
       {
         Console.WriteLine(s);
       }
 
+      Console.WriteLine($"\n{line}");
       Console.WriteLine(columns);
       Console.WriteLine(line);
 
@@ -95,7 +97,12 @@ public static class GenericTable
             break;
           }
 
-          rows[selectedIndex].OnSelect?.Invoke();
+          bool isRemoved = rows[selectedIndex].OnSelect.Invoke();
+
+          if (isRemoved)
+          {
+            rows = ResizeRows(rows, rows[selectedIndex]);
+          }
           continue;
         case ConsoleKey.Escape:
           return;
@@ -106,7 +113,7 @@ public static class GenericTable
     }
   }
 
-  public static RowData<T> FormatDataRow<T>(T data, string[] texts, int[] columnWidths, Action function) where T : class
+  public static RowData<T> FormatDataRow<T>(T data, string[] texts, int[] columnWidths, Func<bool> function) where T : class
   {
     return new RowData<T>(data, FormatRow(texts, columnWidths), function);
   }
@@ -144,5 +151,26 @@ public static class GenericTable
     }
 
     return sum + (widths.Length - 1) * 3;
+  }
+
+  private static RowData<T>[] ResizeRows<T>(RowData<T>[] rows, RowData<T> data) where T : class
+  {
+    RowData<T>[] newRows = new RowData<T>[rows.Length - 1];
+    int index = 0;
+
+    for (int i = 0; i < rows.Length; i++)
+    {
+      // så bra saker man hittar och lär sig mer om
+      // https://learn.microsoft.com/en-us/dotnet/api/system.array.indexof?view=net-10.0
+      if (i == Array.IndexOf(rows, data))
+      {
+        continue;
+      }
+
+      newRows[index] = rows[i];
+      index++;
+    }
+
+    return newRows;
   }
 }

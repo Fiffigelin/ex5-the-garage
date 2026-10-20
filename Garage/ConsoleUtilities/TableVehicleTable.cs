@@ -83,22 +83,22 @@ public static class VehicleTableConsole
     GenericTable.PrintTable(header, columnHeader, columnWidths, rows, [""]);
   }
 
-  private static void ViewVehicleInformation(Vehicle vehicle, ParkingFacility facility)
+  private static bool ViewVehicleInformation(Vehicle vehicle, ParkingFacility facility)
   {
     string[] options = ["Exit Parking", "Back"];
 
-    int input = MenuConsole.MenuHandler(["", vehicle.GetInfo()], options);
+    int input = MenuConsole.MenuHandler(["", vehicle.GetInfo(), ""], options);
 
     switch (input)
     {
       case 0:
         facility.RemoveVehicle(vehicle);
         Console.ReadLine();
-        break;
+        return true;
       case 1:
-        break;
+        return false;
       default:
-        break;
+        return false;
     }
   }
 

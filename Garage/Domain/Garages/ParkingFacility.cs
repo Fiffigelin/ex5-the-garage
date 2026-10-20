@@ -13,14 +13,16 @@ public partial class ParkingFacility
 
   public Vehicle[] Vehicles
   {
-    get => _vehicles;
+    // klona arrayen (shallow copy)
+    // https://learn.microsoft.com/en-us/dotnet/api/system.array.clone?view=net-10.0
+    get => (Vehicle[])_vehicles.Clone();
     set
     {
       ArgumentNullException.ThrowIfNull(value);
 
       if (value.Length > ParkingLots)
       {
-        throw new ArgumentException("There's more vehicles, than available parking lots");
+        throw new ArgumentException("There's more vehicles than available parking lots");
       }
 
       _vehicles = new Vehicle[ParkingLots];
@@ -94,10 +96,10 @@ public partial class ParkingFacility
   }
 
   //eller ska den finnas i en serviceklass??
-  public Vehicle[] FindCars(string search)
-  {
-    return IsCarInGarage(search.ToUpper());
-  }
+  // public Vehicle[] FindCars(string search)
+  // {
+  //   return IsCarInGarage(search.ToUpper());
+  // }
 
   private bool IsGarageFull(Vehicle vehicle)
   {
@@ -106,7 +108,7 @@ public partial class ParkingFacility
       throw new ArgumentException("Something went wrong", nameof(vehicle));
     }
 
-    for (int i = 0; i < Vehicles.Length; i++)
+    for (int i = 0; i < _vehicles.Length; i++)
     {
       if (_vehicles[i] is null)
       {
@@ -121,7 +123,7 @@ public partial class ParkingFacility
   {
     for (int i = 0; i < _vehicles.Length; i++)
     {
-      if (_vehicles[i].Id == vehicle.Id)
+      if (_vehicles[i] is not null && _vehicles[i].Id == vehicle.Id)
       {
         _vehicles[i] = null!;
         return true;
@@ -129,35 +131,5 @@ public partial class ParkingFacility
     }
 
     return false;
-  }
-
-  private Vehicle[] IsCarInGarage(string search)
-  {
-    Vehicle[] foundVehicles = [];
-    for (int i = 0; i < _vehicles.Length; i++)
-    {
-      Vehicle vehicle = _vehicles[i];
-
-      if (vehicle == null)
-      {
-        continue;
-      }
-
-      if (vehicle.LicensePlate == search ||
-          vehicle.Color == search ||
-          vehicle.Type.ToString().ToUpper() == search ||
-          vehicle.NumberOfWheels.ToString() == search)
-      {
-        Array.Resize(ref foundVehicles, foundVehicles.Length + 1);
-
-        // IDE rekommenderade 'use index operator'
-        // fick google:a [^1] vilket är sista elementet i arrayen, [^2] nästsista osv
-        // alltid lär man sig något nytt! :)
-        // foundVehicles[foundVehicles.Length - 1] = vehicle;
-        foundVehicles[^1] = vehicle;
-      }
-    }
-
-    return foundVehicles;
   }
 }

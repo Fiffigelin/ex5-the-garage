@@ -40,9 +40,9 @@ public static class InputConsole
     }
   }
 
-  public static bool TextToBool(string[] message, string[] options)
+  public static bool TextToBool(string message)
   {
-    int input = MenuConsole.MenuHandler(message, options);
+    int input = MenuConsole.MenuHandler([message], ["Yes", "No"]);
 
     switch (input)
     {

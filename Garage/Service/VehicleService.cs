@@ -15,14 +15,19 @@ public static partial class VehicleService
   public static Vehicle AddVehicle(VehicleType type, FacilityData data)
   {
     string color = InputConsole.StringInput("Color: ");
-    int numberOfWheels = InputConsole.IntInput("Number of wheels: ");
 
     switch (type)
     {
       case VehicleType.Car:
-        return CreateCar(color, numberOfWheels, data);
+        return CreateCar(color, data);
+      case VehicleType.Motorcycle:
+        return CreateMotorcycle(color, data);
       case VehicleType.Bus:
-        return CreateBus(color, numberOfWheels, data);
+        return CreateBus(color, data);
+      case VehicleType.Airplane:
+        return CreateAirplane(color, data);
+      case VehicleType.Boat:
+        return CreateBoat(color);
       default:
         throw new ArgumentException("Could not add vehicle. Please try again!");
     }

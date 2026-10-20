@@ -50,7 +50,10 @@ public static class VehicleConsole
   {
     string[] options = [
       $"{PrintVehicleType(VehicleType.Car)} Car",
+      $"{PrintVehicleType(VehicleType.Motorcycle)} Motorcycle",
       $"{PrintVehicleType(VehicleType.Bus)} Bus",
+      $"{PrintVehicleType(VehicleType.Airplane)} Airplane",
+      $"{PrintVehicleType(VehicleType.Boat)} Boat",
       "Back"
     ];
 
@@ -66,7 +69,13 @@ public static class VehicleConsole
       case 0:
         return VehicleType.Car;
       case 1:
+        return VehicleType.Motorcycle;
+      case 2:
         return VehicleType.Bus;
+      case 3:
+        return VehicleType.Airplane;
+      case 4:
+        return VehicleType.Boat;
       default:
         throw new ArgumentException("What are you trying to choose?");
     }

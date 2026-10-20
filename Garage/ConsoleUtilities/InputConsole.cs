@@ -1,13 +1,11 @@
 using System;
-using System.Text.RegularExpressions;
 using Garage.Domain.Garages;
+using Garage.Domain.Vehicles;
 
 namespace Garage.ConsoleUtilities;
 
 public static class InputConsole
 {
-  private const string LicensePlatePattern =
-@"^[A-HJ-NPR-UW-Z]{3}[0-9]{2}[0-9A-HJ-NPR-UW-Z]$";
   public static string StringInput(string message)
   {
     while (true)
@@ -24,34 +22,41 @@ public static class InputConsole
     }
   }
 
-  public static int IntInput(string message)
+  public static int IntInput(string message, int max = int.MaxValue)
   {
     while (true)
     {
       Console.Write(message);
       _ = int.TryParse(Console.ReadLine(), out int input);
 
-      if (input > 0)
+      if (input > 0 && input <= max)
       {
         return input;
       }
 
-      Console.WriteLine("You need to enter a value higher than zero. Please try again!");
+      Console.WriteLine(max == int.MaxValue
+        ? $"You need to enter a value between 1 and {max}. Please try again!"
+        : "You need to enter a value higher than zero. Please try again!");
     }
   }
 
   public static bool TextToBool(string message)
   {
-    int input = MenuConsole.MenuHandler([message], ["Yes", "No"]);
-
-    switch (input)
+    while (true)
     {
-      case 0:
-        return true;
-      case 1:
-        return false;
-      default:
-        throw new ArgumentException("Ops, something went wrong!");
+      int input = MenuConsole.MenuHandler([message], ["Yes", "No"]);
+
+      switch (input)
+      {
+        case -1:
+          continue;
+        case 0:
+          return true;
+        case 1:
+          return false;
+        default:
+          throw new ArgumentException("Ops, something went wrong!");
+      }
     }
   }
 
@@ -99,15 +104,22 @@ public static class InputConsole
       }
 
       input = input.Trim().ToUpper();
-      bool isUnique = data.IsLicenseplateUnique(input);
 
-      if (isUnique &&
-          Regex.IsMatch(input, LicensePlatePattern))
+      if (!Vehicle.IsValidLicensePlate(input))
       {
-        return input;
+        Console.WriteLine(
+            "The license plate does not follow Swedish rules. Please try again!");
+        continue;
       }
 
-      Console.WriteLine("You have to insert a licenseplate that follows swedish rules and is unique. Please try again!");
+      if (!data.IsLicenseplateUnique(input))
+      {
+        Console.WriteLine(
+            "This license plate is already registered. Please try again!");
+        continue;
+      }
+
+      return input;
     }
   }
 
@@ -118,12 +130,12 @@ public static class InputConsole
       Console.Write(message);
       string? input = Console.ReadLine();
 
-      if (!string.IsNullOrWhiteSpace(input) && data.IsNameUnique(input))
+      if (!string.IsNullOrWhiteSpace(input) && input.Length >= 3 && data.IsNameUnique(input))
       {
         return input;
       }
 
-      Console.WriteLine("You need to enter a name that is unique. Please try again!");
+      Console.WriteLine("You need to enter a name that is unique and at least 3 characters. Please try again!");
     }
   }
 }

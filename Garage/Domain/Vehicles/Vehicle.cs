@@ -1,11 +1,8 @@
 using System;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using Garage.Domain.General;
 
 namespace Garage.Domain.Vehicles;
-
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(Car), "Car")]
 
 public abstract class Vehicle
 {
@@ -14,9 +11,6 @@ public abstract class Vehicle
   private const string LicensePlatePattern =
       @"^[A-HJ-NPR-UW-Z]{3}[0-9]{2}[0-9A-HJ-NPR-UW-Z]$";
   public Guid Id { get; }
-
-  // denna sätts i barn-klasserna
-  [JsonIgnore]
   public VehicleType Type { get; }
   public string Color { get; }
   public int NumberOfWheels { get; }
@@ -30,7 +24,7 @@ public abstract class Vehicle
       throw new ArgumentException("Color cannot be null or empty.", nameof(color));
     }
 
-    if (type != VehicleType.Boat && !Regex.IsMatch(licensePlate?.ToUpper() ?? string.Empty, LicensePlatePattern))
+    if (type != VehicleType.Boat && !IsValidLicensePlate(licensePlate))
     {
       throw new ArgumentException("License plate is not in a valid format.", nameof(licensePlate));
     }
@@ -46,13 +40,33 @@ public abstract class Vehicle
     NumberOfWheels = type == VehicleType.Boat ? 0 : numberOfWheels;
     LicensePlate = licensePlate?.ToUpper();
   }
+
+  public static bool IsValidLicensePlate(string? licensePlate)
+  {
+    return !string.IsNullOrWhiteSpace(licensePlate)
+        && Regex.IsMatch(
+            licensePlate.Trim(),
+            LicensePlatePattern,
+            RegexOptions.IgnoreCase);
+  }
   public virtual string GetInfo()
   {
-    return
-    $"{(string.IsNullOrWhiteSpace(LicensePlate) ? "" : $"License plate: {LicensePlate}\n")}" +
-    $"Type: {Type}\n" +
-    $"Color: {Color}" +
-    $"{(NumberOfWheels > 0 ? $"\nWheels: {NumberOfWheels}" : "")}";
+    string info = string.Empty;
+
+    if (!string.IsNullOrWhiteSpace(LicensePlate))
+    {
+      info += $"Licenseplate: {LicensePlate}\n";
+    }
+
+    info += $"Type: {Type}\n";
+    info += $"Color: {Color}";
+
+    if (NumberOfWheels > 0)
+    {
+      info += $"\nWheels: {NumberOfWheels}";
+    }
+
+    return info;
   }
 }
 

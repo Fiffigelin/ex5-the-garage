@@ -1,4 +1,5 @@
 using System;
+using Garage.Domain.General;
 
 namespace Garage.Domain.Vehicles;
 
@@ -21,6 +22,6 @@ public class Bus : Vehicle
   {
     string info = base.GetInfo();
     return info +
-      $"Amount of seats: {NumberOfSeats}";
+      $"\nAmount of seats: {NumberOfSeats}";
   }
 }

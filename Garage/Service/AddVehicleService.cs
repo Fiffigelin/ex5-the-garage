@@ -19,7 +19,7 @@ public static partial class VehicleService
   {
     int numberOfWheels = InputConsole.IntInput("Number of wheels: ");
     string licenseplate = InputConsole.LicenceInput("Licenseplate: ", data);
-    bool hasSidecar = InputConsole.TextToBool("Number of seats: ");
+    bool hasSidecar = InputConsole.TextToBool("Has Sidecar:");
     return new Motorcycle(color, numberOfWheels, licenseplate, hasSidecar);
   }
   private static Vehicle CreateBus(string color, FacilityData data)

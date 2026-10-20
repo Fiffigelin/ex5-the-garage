@@ -1,4 +1,4 @@
-namespace Garage.Domain.Vehicles;
+namespace Garage.Domain.General;
 
 public enum VehicleType
 {

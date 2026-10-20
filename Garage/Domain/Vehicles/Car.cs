@@ -2,6 +2,7 @@
 
 using System;
 using System.Text.Json.Serialization;
+using Garage.Domain.General;
 
 namespace Garage.Domain.Vehicles;
 

@@ -1,76 +1,75 @@
 using System;
-using System.Linq;
 using Garage.Domain.Vehicles;
 
 namespace Garage.Domain.Garages;
 
 public class FacilityData
 {
-  private ParkingFacility[] _garages = [];
+  private ParkingFacility[] _facilities = [];
 
-  public ParkingFacility[] Garages => _garages;
+  public ParkingFacility[] Facilities
+  {
+    get
+    {
+      return (ParkingFacility[])_facilities.Clone();
+    }
+  }
 
   public void AddFacility(ParkingFacility facility)
   {
     ArgumentNullException.ThrowIfNull(facility);
 
-    Array.Resize(ref _garages, _garages.Length + 1);
-    _garages[^1] = facility;
+    Array.Resize(ref _facilities, _facilities.Length + 1);
+    _facilities[^1] = facility;
   }
 
   public bool IsNameUnique(string name)
   {
-    return !IsNameInArray(name);
+    foreach (ParkingFacility facility in _facilities)
+    {
+      if (string.Equals(
+        facility.Name,
+        name,
+        StringComparison.OrdinalIgnoreCase
+      ))
+      {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   public ParkingFacility[] AvailableParking()
   {
-    return AvailableParkingFacilites();
+    ParkingFacility[] available = [];
+
+    foreach (ParkingFacility pf in _facilities)
+    {
+      if (!pf.IsFull)
+      {
+        Array.Resize(ref available, available.Length + 1);
+        available[^1] = pf;
+      }
+    }
+
+    return available;
   }
 
   public bool IsLicenseplateUnique(string license)
   {
-    return IsLicenseAvailable(license);
-  }
+    ArgumentException.ThrowIfNullOrWhiteSpace(license);
 
-  private bool IsNameInArray(string name)
-  {
-    return _garages.Any(garage => string.Equals(garage.Name, name, StringComparison.OrdinalIgnoreCase));
-  }
-
-  private ParkingFacility[] AvailableParkingFacilites()
-  {
-    ParkingFacility[] park = [];
-
-    foreach (ParkingFacility pf in _garages)
+    foreach (ParkingFacility pf in _facilities)
     {
-      int occupiedLots = 0;
+      Vehicle[] vehicles = pf.ParkedVehicles();
 
-      for (int i = 0; i < pf.Vehicles.Length; i++)
+      foreach (Vehicle? vh in vehicles)
       {
-        if (pf.Vehicles[i] is not null)
-        {
-          occupiedLots += 1;
-        }
-      }
-
-      int lots = pf.ParkingLots - occupiedLots;
-      if (lots > 0)
-      {
-        Array.Resize(ref park, park.Length + 1);
-        park[^1] = pf;
-      }
-    }
-    return park;
-  }
-
-  private bool IsLicenseAvailable(string license)
-  {
-    foreach (ParkingFacility park in _garages)
-    {
-      foreach (Vehicle vh in park.Vehicles)
-      {
-        if (vh is not null && vh.LicensePlate == license.ToUpper())
+        if (string.Equals(
+            vh.LicensePlate,
+            license.Trim(),
+            StringComparison.OrdinalIgnoreCase))
         {
           return false;
         }

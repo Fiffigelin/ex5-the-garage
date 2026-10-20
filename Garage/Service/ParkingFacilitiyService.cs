@@ -11,10 +11,10 @@ public static class ParkingFacilityService
   {
     while (true)
     {
-
+      ParkingFacility[] facilities = data.Facilities;
       string[] options = ["Add New Parking Facility"];
 
-      foreach (ParkingFacility facility in data.Garages)
+      foreach (ParkingFacility facility in facilities)
       {
         Array.Resize(ref options, options.Length + 1);
         options[^1] = facility.Name;
@@ -34,7 +34,7 @@ public static class ParkingFacilityService
       }
       else
       {
-        VehicleTableConsole.ViewVehiclesTable(data.Garages[input - 1]);
+        VehicleTableConsole.ViewVehiclesTable(facilities[input - 1]);
       }
     }
   }
@@ -47,6 +47,17 @@ public static class ParkingFacilityService
     string facilityName = InputConsole.FacilityNameInput("Name: ", data);
     int parkingLots = InputConsole.IntInput("Amount of parkinglots: ");
 
-    data.AddFacility(new ParkingFacility(facilityName, parkingLots));
+    try
+    {
+      data.AddFacility(new ParkingFacility(facilityName, parkingLots));
+      Console.WriteLine($"\nParking facility '{facilityName}' has been added with {parkingLots} lots");
+    }
+    catch (ArgumentException ex)
+    {
+      Console.WriteLine($"\nCould not create the parking facility: {ex.Message}");
+    }
+
+    Console.WriteLine("Press any key to continue...");
+    Console.ReadKey(true);
   }
 }

@@ -1,45 +1,36 @@
 using System;
-using System.Text.Json.Serialization;
 using Garage.Domain.Vehicles;
 
 namespace Garage.Domain.Garages;
 
-public partial class ParkingFacility
+public class ParkingFacility
 {
-  private Vehicle[] _vehicles;
+  private readonly Vehicle?[] _vehicles;
   public Guid Id { get; }
   public string Name { get; }
   public int ParkingLots { get; }
-
-  public Vehicle[] Vehicles
+  public int FreeLots => ParkingLots - CountParkedVehicles();
+  public bool IsFull => FreeLots == 0;
+  public Vehicle?[] Vehicles
   {
-    // klona arrayen (shallow copy)
-    // https://learn.microsoft.com/en-us/dotnet/api/system.array.clone?view=net-10.0
-    get => (Vehicle[])_vehicles.Clone();
-    set
+    get
     {
-      ArgumentNullException.ThrowIfNull(value);
-
-      if (value.Length > ParkingLots)
-      {
-        throw new ArgumentException("There's more vehicles than available parking lots");
-      }
-
-      _vehicles = new Vehicle[ParkingLots];
-      Array.Copy(value, _vehicles, value.Length);
+      return (Vehicle?[])_vehicles.Clone();
     }
   }
+  public const int MaxParkingLots = 200;
+  public const int MinNameLength = 3;
 
   public ParkingFacility(string name, int parkingLots)
   {
-    if (string.IsNullOrWhiteSpace(name) || name.Length <= 2)
+    if (string.IsNullOrWhiteSpace(name) || name.Length < MinNameLength)
     {
       throw new ArgumentException("Name needs to have atleast 3 chars", nameof(name));
     }
 
-    if (parkingLots <= 0)
+    if (parkingLots <= 0 || parkingLots > MaxParkingLots)
     {
-      throw new ArgumentException("Parkinglots needs to be more than zero", nameof(parkingLots));
+      throw new ArgumentException("Parkinglots needs to be more than zero and at the max 200", nameof(parkingLots));
     }
 
     Id = Guid.NewGuid();
@@ -48,77 +39,16 @@ public partial class ParkingFacility
     _vehicles = new Vehicle[parkingLots];
   }
 
-  [JsonConstructor]
-  public ParkingFacility(Guid id, string name, int parkingLots)
+  public bool AddVehicle(Vehicle vehicle)
   {
-    if (string.IsNullOrWhiteSpace(name) || name.Length <= 2)
+    ArgumentNullException.ThrowIfNull(vehicle);
+
+    for (int i = 0; i < _vehicles.Length; i++)
     {
-      throw new ArgumentException("Name needs to have atleast 3 chars", nameof(name));
-    }
-
-    if (parkingLots <= 0)
-    {
-      throw new ArgumentException("Parkinglots needs to be more than zero", nameof(parkingLots));
-    }
-
-    Id = id;
-    Name = name;
-    ParkingLots = parkingLots;
-    _vehicles = new Vehicle[parkingLots];
-  }
-
-  public void AddVehicle(Vehicle vehicle)
-  {
-    bool isParked = IsGarageFull(vehicle);
-
-    if (isParked == true)
-    {
-      ParkingCar(vehicle.Type);
-    }
-    else
-    {
-      NoMoreLots(vehicle.Type);
-    }
-  }
-
-  public void RemoveVehicle(Vehicle vehicle)
-  {
-    bool hasLeft = RemoveVehicleFromGarage(vehicle);
-
-    if (hasLeft)
-    {
-      LeaveGarage(vehicle.Type);
-    }
-    else
-    {
-      WheresMyCar(vehicle.Type);
-    }
-  }
-
-  public int ParkedCars()
-  {
-    return CalculateParkedCars();
-  }
-
-  private int CalculateParkedCars()
-  {
-    int sum = 0;
-    foreach (Vehicle v in _vehicles)
-    {
-      if (v is not null)
+      if (_vehicles[i]?.Id == vehicle.Id)
       {
-        sum++;
+        return false;
       }
-    }
-
-    return sum;
-  }
-
-  private bool IsGarageFull(Vehicle vehicle)
-  {
-    if (string.IsNullOrWhiteSpace(vehicle.Id.ToString()))
-    {
-      throw new ArgumentException("Something went wrong", nameof(vehicle));
     }
 
     for (int i = 0; i < _vehicles.Length; i++)
@@ -129,20 +59,54 @@ public partial class ParkingFacility
         return true;
       }
     }
+
     return false;
   }
 
-  private bool RemoveVehicleFromGarage(Vehicle vehicle)
+  public bool RemoveVehicle(Vehicle vehicle)
   {
+    ArgumentNullException.ThrowIfNull(vehicle);
+
     for (int i = 0; i < _vehicles.Length; i++)
     {
-      if (_vehicles[i] is not null && _vehicles[i].Id == vehicle.Id)
+      if (_vehicles[i]?.Id == vehicle.Id)
       {
-        _vehicles[i] = null!;
+        _vehicles[i] = null;
         return true;
       }
     }
 
     return false;
+  }
+
+  public int CountParkedVehicles()
+  {
+    int sum = 0;
+    foreach (Vehicle? v in _vehicles)
+    {
+      if (v is not null)
+      {
+        sum++;
+      }
+    }
+
+    return sum;
+  }
+
+  public Vehicle[] ParkedVehicles()
+  {
+    Vehicle[] result = new Vehicle[CountParkedVehicles()];
+    int index = 0;
+
+    foreach (Vehicle? vehicle in _vehicles)
+    {
+      if (vehicle is not null)
+      {
+        result[index] = vehicle;
+        index++;
+      }
+    }
+
+    return result;
   }
 }

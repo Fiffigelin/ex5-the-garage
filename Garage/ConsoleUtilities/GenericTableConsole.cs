@@ -1,6 +1,4 @@
 using System;
-using System.Data;
-using Garage.Domain.Vehicles;
 
 namespace Garage.ConsoleUtilities;
 
@@ -18,9 +16,14 @@ public class RowData<T> where T : class
     OnSelect = onSelect;
   }
 }
-public static class GenericTable
+public static class GenericTableConsole
 {
-  public static void PrintTable<T>(string[] header, string[] columnHeader, int[] columnWidths, RowData<T>[] rows, string[] footer) where T : class
+  public static void PrintTable<T>(
+    Func<string[]> header,
+    string[] columnHeader,
+    int[] columnWidths,
+    RowData<T>[] rows,
+    Func<string[]> footer) where T : class
   {
     int selectedIndex = 0;
     string line = new string('-', CalculateTableWidth(columnWidths));
@@ -31,7 +34,7 @@ public static class GenericTable
       TitleConsole.DisplayMainTitle();
       Console.WriteLine();
 
-      foreach (string s in header)
+      foreach (string s in header())
       {
         Console.WriteLine(s);
       }
@@ -63,7 +66,7 @@ public static class GenericTable
 
         if (footer is not null)
         {
-          foreach (string f in footer)
+          foreach (string f in footer())
           {
             Console.WriteLine(f);
           }
@@ -102,6 +105,7 @@ public static class GenericTable
           if (isRemoved)
           {
             rows = ResizeRows(rows, rows[selectedIndex]);
+            selectedIndex = Math.Max(0, Math.Min(selectedIndex, rows.Length - 1));
           }
           continue;
         case ConsoleKey.Escape:

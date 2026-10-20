@@ -1,4 +1,5 @@
 using System;
+using Garage.Domain.General;
 
 namespace Garage.Domain.Vehicles;
 

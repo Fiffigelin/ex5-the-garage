@@ -7,11 +7,15 @@ public static class MenuConsole
 
   public static int MenuHandler(string[] previousTexts, string[] options)
   {
+    if (options.Length == 0)
+    {
+      return -1;
+    }
+
     int selectedIndex = 0;
 
     while (true)
     {
-      Console.Clear();
       TitleConsole.DisplayMainTitle();
 
       foreach (string text in previousTexts)

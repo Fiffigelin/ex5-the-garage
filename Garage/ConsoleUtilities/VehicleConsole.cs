@@ -1,5 +1,5 @@
 using System;
-using Garage.Domain.Vehicles;
+using Garage.Domain.General;
 
 namespace Garage.ConsoleUtilities;
 
@@ -38,7 +38,7 @@ public static class VehicleConsole
 
     int input = MenuConsole.MenuHandler(["", "Search vehicles", "Type of vehicle", ""], options);
 
-    if (input <= 0)
+    if (input <= 0 || input > types.Length)
     {
       return null;
     }
@@ -61,7 +61,7 @@ public static class VehicleConsole
 
     if (input == -1 || input == options.Length - 1)
     {
-      return null!;
+      return null;
     }
 
     switch (input)

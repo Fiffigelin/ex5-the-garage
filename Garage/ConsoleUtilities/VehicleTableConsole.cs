@@ -1,5 +1,6 @@
 using System;
 using Garage.Domain.Garages;
+using Garage.Domain.General;
 using Garage.Domain.Vehicles;
 using static Garage.Service.VehicleService;
 
@@ -10,15 +11,14 @@ public static class VehicleTableConsole
   public static void ViewVehiclesTable(ParkingFacility facility)
   {
     int[] columnWidths = [1, 12, 12, 10, 10];
-    string[] header = [$"Facility: {facility.Name}", $"Amount of Parkinglots: {facility.ParkingLots}", $"Free Parkinglots: {facility.ParkingLots - facility.ParkedCars()}"];
     string[] columnHeader = ["", "License", "Type", "Color", "Wheels"];
 
-    RowData<Vehicle>[] rows = new RowData<Vehicle>[facility.ParkedCars()];
-    Vehicle[] vehicles = new Vehicle[facility.ParkedCars()];
+    RowData<Vehicle>[] rows = new RowData<Vehicle>[facility.CountParkedVehicles()];
+    Vehicle[] vehicles = new Vehicle[facility.CountParkedVehicles()];
     int index = 0;
     for (int i = 0; i < facility.Vehicles.Length; i++)
     {
-      Vehicle vehicle = facility.Vehicles[i];
+      Vehicle? vehicle = facility.Vehicles[i];
       if (vehicle is not null)
       {
         // jag veeeeet ingen lambda. Men jag satt i flera
@@ -26,7 +26,7 @@ public static class VehicleTableConsole
         // och jag ville inte snubbla vid mållinjen
 
         // jag kör for och foreach på varenda lilla array
-        rows[index] = GenericTable.FormatDataRow(
+        rows[index] = GenericTableConsole.FormatDataRow(
           vehicle,
           [
             "",
@@ -43,9 +43,17 @@ public static class VehicleTableConsole
         index++;
       }
     }
-    string[] footer = [VehicleStat(vehicles)];
 
-    GenericTable.PrintTable(header, columnHeader, columnWidths, rows, footer);
+    GenericTableConsole.PrintTable(
+      () => [
+        $"Facility: {facility.Name}",
+        $"Amount of Parkinglots: {facility.ParkingLots}",
+        $"Free Parkinglots: {facility.ParkingLots - facility.CountParkedVehicles()}"
+      ],
+      columnHeader,
+      columnWidths,
+      rows,
+      () => [VehicleStat(GetParkedVehicles(facility))]);
   }
   public static void ViewSearchTable(VehicleSearchResult[] results)
   {
@@ -60,7 +68,7 @@ public static class VehicleTableConsole
     {
       VehicleSearchResult result = results[i];
       {
-        rows[i] = GenericTable.FormatDataRow(
+        rows[i] = GenericTableConsole.FormatDataRow(
             result,
             [
                 "",
@@ -80,7 +88,7 @@ public static class VehicleTableConsole
       }
     }
 
-    GenericTable.PrintTable(header, columnHeader, columnWidths, rows, [""]);
+    GenericTableConsole.PrintTable(() => header, columnHeader, columnWidths, rows, () => [""]);
   }
 
   private static bool ViewVehicleInformation(Vehicle vehicle, ParkingFacility facility)
@@ -92,11 +100,23 @@ public static class VehicleTableConsole
     switch (input)
     {
       case 0:
-        facility.RemoveVehicle(vehicle);
-        Console.ReadLine();
-        return true;
+        bool removed = facility.RemoveVehicle(vehicle);
+
+        if (removed)
+        {
+          ParkingMessageConsole.LeaveGarage(vehicle.Type);
+        }
+        else
+        {
+          ParkingMessageConsole.WheresMyCar(vehicle.Type);
+        }
+
+        Console.WriteLine("Press any key to continue...");
+        Console.ReadKey(true);
+
+        return removed;
       case 1:
-        return false;
+      case -1:
       default:
         return false;
     }
@@ -126,5 +146,23 @@ public static class VehicleTableConsole
     }
 
     return sum;
+  }
+
+  private static Vehicle[] GetParkedVehicles(ParkingFacility facility)
+  {
+    Vehicle?[] allVehicles = facility.Vehicles;
+    Vehicle[] parkedVehicles = new Vehicle[facility.CountParkedVehicles()];
+    int index = 0;
+
+    for (int i = 0; i < allVehicles.Length; i++)
+    {
+      if (allVehicles[i] is not null)
+      {
+        parkedVehicles[index] = allVehicles[i]!;
+        index++;
+      }
+    }
+
+    return parkedVehicles;
   }
 }

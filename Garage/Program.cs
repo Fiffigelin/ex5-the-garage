@@ -1,6 +1,7 @@
 using System;
 using Garage.ConsoleUtilities;
 using Garage.Domain.Garages;
+using Garage.Domain.General;
 using Garage.Domain.Vehicles;
 using Garage.Service;
 
@@ -29,38 +30,44 @@ internal class Program
 
     while (true)
     {
-      string[] mainOptions =
+      try
       {
+
+        string[] mainOptions =
+        {
          "Show Parking Facilities",
          "Park Vehicle",
-         "Remove Vehicle",
          "Search Vehicles",
          "Exit"
-     };
+        };
 
-      int choice = MenuConsole.MenuHandler(["Welcome to Elins Parking Solution", "Parky Squeezy, Nice and Easy!\n"], mainOptions);
+        int choice = MenuConsole.MenuHandler(["Welcome to Elins Parking Solution", "Parky Squeezy, Nice and Easy!\n"], mainOptions);
 
-      switch (choice)
+        switch (choice)
+        {
+          case -1:
+            Environment.Exit(0);
+            break;
+          case 0:
+            HandleParkingFacilities();
+            break;
+          case 1:
+            ParkVehicle();
+            break;
+          case 2:
+            VehicleService.SearchVehicles(Facilities);
+            break;
+          case 3:
+            Environment.Exit(0);
+            break;
+        }
+      }
+      catch (Exception ex)
       {
-        case -1:
-          Environment.Exit(0);
-          break;
-        case 0:
-          HandleParkingFacilities();
-          break;
-        case 1:
-          ParkVehicle();
-          break;
-        case 2:
-          Console.WriteLine("Removing vehicle...");
-          Console.ReadKey();
-          break;
-        case 3:
-          VehicleService.SearchVehicles(Facilities);
-          break;
-        case 4:
-          Environment.Exit(0);
-          break;
+        Console.Clear();
+        Console.WriteLine($"Something unexped happened: {ex.Message}");
+        Console.WriteLine("Press any key to return to the menu...");
+        Console.ReadKey(true);
       }
     }
   }
@@ -103,14 +110,34 @@ internal class Program
       }
 
       ParkingFacility parking = facilities[input];
-      Vehicle vehicle = VehicleService.AddVehicle((VehicleType)type, Facilities);
+      Vehicle? vehicle;
 
-      if (vehicle is not null)
+      try
       {
-        parking.AddVehicle(vehicle);
-        Console.ReadLine();
-        return;
+        vehicle = VehicleService.AddVehicle((VehicleType)type, Facilities);
       }
+      catch (ArgumentException ex)
+      {
+        Console.WriteLine($"Could not create the vehicle: {ex.Message}");
+        Console.WriteLine("Press any key to try again...");
+        Console.ReadKey(true);
+        continue;
+      }
+
+      bool parked = parking.AddVehicle(vehicle);
+
+      if (parked)
+      {
+        ParkingMessageConsole.ParkingCar(vehicle.Type);
+      }
+      else
+      {
+        ParkingMessageConsole.NoMoreLots(vehicle.Type);
+      }
+
+      Console.WriteLine("Press any key to continue...");
+      Console.ReadKey(true);
+      return;
     }
   }
 }

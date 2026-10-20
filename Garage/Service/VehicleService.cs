@@ -56,15 +56,17 @@ public static partial class VehicleService
     ArgumentNullException.ThrowIfNull(search);
     ArgumentNullException.ThrowIfNull(facility);
 
-    Vehicle[] vehicles = facility.Vehicles;
+    Vehicle?[] vehicles = facility.Vehicles;
     Vehicle[] results = new Vehicle[vehicles.Length];
     int count = 0;
 
     for (int i = 0; i < vehicles.Length; i++)
     {
-      if (vehicles[i] is not null && search.Matches(vehicles[i]))
+      Vehicle? vehicle = vehicles[i];
+
+      if (vehicle is not null && search.Matches(vehicle))
       {
-        results[count] = vehicles[i];
+        results[count] = vehicle;
         count++;
       }
     }
@@ -85,7 +87,7 @@ public static partial class VehicleService
 
     VehicleSearchResult[] hits = [];
 
-    foreach (ParkingFacility facility in data.Garages)
+    foreach (ParkingFacility facility in data.Facilities)
     {
       Vehicle[] vehicles = SearchVehicle(filter, facility);
 

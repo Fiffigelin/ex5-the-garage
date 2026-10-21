@@ -1,7 +1,8 @@
 using System;
+using System.IO;
 using Garage.ConsoleUtilities;
+using Garage.Data;
 using Garage.Domain.Garages;
-using Garage.Domain.Vehicles;
 using Garage.Service;
 
 internal class Program
@@ -9,20 +10,33 @@ internal class Program
   private static readonly GarageData GarageData = new();
   private static void Main(string[] args)
   {
-    Car car1 = new("vit", 4, "abc123", 5, true);
-    Car car2 = new("röd", 4, "bcd123", 5, false);
-    Car car3 = new("blå", 4, "bcd12a", 5, false);
-    Garage.Domain.Garages.Garage garage = new("Centralt", 6);
-    Garage.Domain.Garages.Garage garage1 = new("Öster", 6);
-    Garage.Domain.Garages.Garage garage2 = new("Väster", 6);
-    garage.AddVehicle(car1);
-    garage.AddVehicle(car2);
-    garage.AddVehicle(car3);
-    GarageData.AddFacility(garage);
-    GarageData.AddFacility(garage1);
-    GarageData.AddFacility(garage2);
+    string filePath = Path.Combine(
+    AppContext.BaseDirectory,
+    "Data",
+    "data.json");
 
-    car3.GetInfo();
+    Console.WriteLine($"Sökväg: {filePath}");
+    Console.WriteLine($"Filen finns: {File.Exists(filePath)}");
+    Console.WriteLine($"JSON-innehåll:\n{File.ReadAllText(filePath)}");
+
+    GarageSeeder.Seed(GarageData, filePath);
+
+    Console.WriteLine(
+    $"Antal seedade garage: {GarageData.Garages.Length}");
+    Console.ReadKey(true);
+
+    // Car car1 = new("vit", 4, "abc123", 5, true);
+    // Car car2 = new("röd", 4, "bcd123", 5, false);
+    // Car car3 = new("blå", 4, "bcd12a", 5, false);
+    // Garage.Domain.Garages.Garage garage = new("Centralt", 6);
+    // Garage.Domain.Garages.Garage garage1 = new("Öster", 6);
+    // Garage.Domain.Garages.Garage garage2 = new("Väster", 6);
+    // garage.AddVehicle(car1);
+    // garage.AddVehicle(car2);
+    // garage.AddVehicle(car3);
+    // GarageData.AddFacility(garage);
+    // GarageData.AddFacility(garage1);
+    // GarageData.AddFacility(garage2);
 
     while (true)
     {

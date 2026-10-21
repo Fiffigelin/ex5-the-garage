@@ -24,7 +24,7 @@ public abstract class Vehicle
       throw new ArgumentException("Color cannot be null or empty.", nameof(color));
     }
 
-    if (type != VehicleType.Boat && !IsValidLicensePlate(licensePlate))
+    if (!IsValidLicensePlate(licensePlate))
     {
       throw new ArgumentException("License plate is not in a valid format.", nameof(licensePlate));
     }
@@ -53,11 +53,7 @@ public abstract class Vehicle
   {
     string info = string.Empty;
 
-    if (!string.IsNullOrWhiteSpace(LicensePlate))
-    {
-      info += $"Licenseplate: {LicensePlate}\n";
-    }
-
+    info += $"Licenseplate: {LicensePlate}\n";
     info += $"Type: {Type}\n";
     info += $"Color: {Color}";
 

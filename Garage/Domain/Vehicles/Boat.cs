@@ -10,6 +10,10 @@ public class Boat : Vehicle
   public Boat(string color, int numberOfWheels, string? licensePlate, int numberOfEngines)
       : base(Guid.NewGuid(), VehicleType.Boat, color, numberOfWheels, licensePlate)
   {
+    if (numberOfEngines <= 0)
+    {
+      throw new ArgumentException("The boat needs 1 or more engines.", nameof(numberOfEngines));
+    }
     NumberOfEngines = numberOfEngines;
   }
 

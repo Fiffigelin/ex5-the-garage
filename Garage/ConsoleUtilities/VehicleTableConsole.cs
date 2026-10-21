@@ -90,6 +90,39 @@ public static class VehicleTableConsole
 
     GenericTableConsole.PrintTable(() => header, columnHeader, columnWidths, rows, () => [""]);
   }
+  public static void ViewAllVehicles(VehicleSearchResult[] results)
+  {
+    int[] columnWidths = [1, -14, -10, -12, -10, 6];
+    string[] header = ["Show Vehicles"];
+    string[] columnHeader = ["", "Facility", "License", "Type", "Color", "Wheels"];
+
+    RowData<VehicleSearchResult>[] rows = new RowData<VehicleSearchResult>[results.Length];
+    Vehicle[] vehicles = new Vehicle[results.Length];
+
+    for (int i = 0; i < results.Length; i++)
+    {
+      VehicleSearchResult result = results[i];
+      {
+        rows[i] = GenericTableConsole.FormatDataRow(
+            result,
+            [
+                "",
+                result.Garage.Name,
+                result.Vehicle.LicensePlate?.Length > 0 ? result.Vehicle.LicensePlate : "",
+                result.Vehicle.Type.ToString(),
+                result.Vehicle.Color.ToString(),
+                result.Vehicle.NumberOfWheels.ToString()
+            ],
+            columnWidths,
+            () => true
+        );
+
+        vehicles[i] = result.Vehicle;
+      }
+    }
+
+    GenericTableConsole.PrintNoIntegrationTable(() => header, columnHeader, columnWidths, rows);
+  }
 
   private static bool ViewVehicleInformation(Vehicle vehicle, Domain.Garages.Garage facility)
   {

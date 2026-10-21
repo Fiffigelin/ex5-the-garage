@@ -24,19 +24,19 @@ public static class VehicleConsole
     }
   }
 
-  public static VehicleType? ChooseVehicleTypeFilter()
+  public static VehicleType? ChooseVehicleTypeFilter(string option, string[] headers)
   {
     VehicleType[] types = Enum.GetValues<VehicleType>();
 
     string[] options = new string[types.Length + 1];
-    options[0] = "Any type";
+    options[0] = option;
 
     for (int i = 0; i < types.Length; i++)
     {
       options[i + 1] = $"{PrintVehicleType(types[i])} {types[i]}";
     }
 
-    int input = MenuConsole.MenuHandler(["", "Search vehicles", "Type of vehicle", ""], options);
+    int input = MenuConsole.MenuHandler(headers, options);
 
     if (input <= 0 || input > types.Length)
     {

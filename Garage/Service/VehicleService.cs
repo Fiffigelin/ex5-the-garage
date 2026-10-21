@@ -74,22 +74,23 @@ public static partial class VehicleService
     }
   }
 
-  public static Vehicle AddVehicle(VehicleType type, GarageData garage)
+  public static Vehicle AddVehicle(VehicleType type, GarageData data)
   {
     string color = InputConsole.StringInput("Color: ");
+    string licenseplate = InputConsole.LicenceInput("Licenseplate: ", data);
 
     switch (type)
     {
       case VehicleType.Car:
-        return CreateCar(color, garage);
+        return CreateCar(color, licenseplate);
       case VehicleType.Motorcycle:
-        return CreateMotorcycle(color, garage);
+        return CreateMotorcycle(color, licenseplate);
       case VehicleType.Bus:
-        return CreateBus(color, garage);
+        return CreateBus(color, licenseplate);
       case VehicleType.Airplane:
-        return CreateAirplane(color, garage);
+        return CreateAirplane(color, licenseplate);
       case VehicleType.Boat:
-        return CreateBoat(color);
+        return CreateBoat(color, licenseplate);
       default:
         throw new ArgumentException("Could not add vehicle. Please try again!");
     }
@@ -104,12 +105,37 @@ public static partial class VehicleService
     string? licensePlate = InputConsole.OptionalStringInput("License plate: ");
     string? color = InputConsole.OptionalStringInput("Color: ");
     int? numberOfWheels = InputConsole.OptionalIntInput("Number of wheels: ");
-    VehicleType? type = VehicleConsole.ChooseVehicleTypeFilter();
+    VehicleType? type = VehicleConsole.ChooseVehicleTypeFilter("Any", ["\nSearch vehicles", "Type of vehicle\n"]);
 
     SearchVehicle filter = new(licensePlate, color, numberOfWheels, type);
     VehicleSearchResult[] results = SearchVehicle(filter, data);
 
     VehicleTableConsole.ViewSearchTable(results);
+  }
+
+  public static void ShowAllParkedVehicles(GarageData data)
+  {
+    while (true)
+    {
+      Console.Clear();
+      TitleConsole.DisplayMainTitle();
+      VehicleType? type = VehicleConsole.ChooseVehicleTypeFilter(" All", ["\nShow Parked Cars By Type"]);
+
+      SearchVehicle filter = new(null, null, null, type);
+      VehicleSearchResult[] results = SearchVehicle(filter, data);
+
+      VehicleTableConsole.ViewAllVehicles(results);
+      ConsoleKey key = Console.ReadKey(true).Key;
+
+      switch (key)
+      {
+        case ConsoleKey.Escape:
+          return;
+        default:
+          break;
+      }
+
+    }
   }
 
   // söker i enskilt parkeringshus

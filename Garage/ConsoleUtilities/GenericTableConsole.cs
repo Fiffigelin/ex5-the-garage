@@ -39,6 +39,8 @@ public static class GenericTableConsole
         Console.WriteLine(s);
       }
 
+      Console.WriteLine("View Vehicle with 'Enter' or Exit with 'Escape'");
+
       Console.WriteLine($"\n{line}");
       Console.WriteLine(columns);
       Console.WriteLine(line);
@@ -115,6 +117,39 @@ public static class GenericTableConsole
           break;
       }
     }
+  }
+  public static void PrintNoIntegrationTable<T>(
+    Func<string[]> header,
+    string[] columnHeader,
+    int[] columnWidths,
+    RowData<T>[] rows) where T : class
+  {
+    string line = new string('-', CalculateTableWidth(columnWidths));
+    string columns = FormatRow(columnHeader, columnWidths);
+
+    foreach (string s in header())
+    {
+      Console.WriteLine(s);
+    }
+
+    Console.WriteLine("Exit with 'Escape'");
+    Console.WriteLine($"\n{line}");
+    Console.WriteLine(columns);
+    Console.WriteLine(line);
+
+    if (rows.Length == 0)
+    {
+      Console.WriteLine("   There's no vehicles parked.");
+    }
+    else
+    {
+      for (int i = 0; i < rows.Length; i++)
+      {
+        Console.WriteLine($"{rows[i].Row}");
+      }
+      Console.WriteLine(line);
+    }
+
   }
 
   public static RowData<T> FormatDataRow<T>(T data, string[] texts, int[] columnWidths, Func<bool> function) where T : class

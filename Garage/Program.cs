@@ -15,28 +15,11 @@ internal class Program
     "Data",
     "data.json");
 
-    Console.WriteLine($"Sökväg: {filePath}");
-    Console.WriteLine($"Filen finns: {File.Exists(filePath)}");
-    Console.WriteLine($"JSON-innehåll:\n{File.ReadAllText(filePath)}");
+    // Console.WriteLine($"Sökväg: {filePath}");
+    // Console.WriteLine($"Filen finns: {File.Exists(filePath)}");
+    // Console.WriteLine($"JSON-innehåll:\n{File.ReadAllText(filePath)}");
 
     GarageSeeder.Seed(GarageData, filePath);
-
-    Console.WriteLine(
-    $"Antal seedade garage: {GarageData.Garages.Length}");
-    Console.ReadKey(true);
-
-    // Car car1 = new("vit", 4, "abc123", 5, true);
-    // Car car2 = new("röd", 4, "bcd123", 5, false);
-    // Car car3 = new("blå", 4, "bcd12a", 5, false);
-    // Garage.Domain.Garages.Garage garage = new("Centralt", 6);
-    // Garage.Domain.Garages.Garage garage1 = new("Öster", 6);
-    // Garage.Domain.Garages.Garage garage2 = new("Väster", 6);
-    // garage.AddVehicle(car1);
-    // garage.AddVehicle(car2);
-    // garage.AddVehicle(car3);
-    // GarageData.AddFacility(garage);
-    // GarageData.AddFacility(garage1);
-    // GarageData.AddFacility(garage2);
 
     while (true)
     {
@@ -45,6 +28,7 @@ internal class Program
         string[] mainOptions =
         {
          "Show Parking Facilities",
+         "Show All Parked Vehicles",
          "Park Vehicle",
          "Search Vehicles",
          "Exit"
@@ -61,12 +45,15 @@ internal class Program
             ParkingFacilityService.HandleParkingFacilities(GarageData);
             break;
           case 1:
-            VehicleService.ParkVehicle(GarageData);
+            VehicleService.ShowAllParkedVehicles(GarageData);
             break;
           case 2:
-            VehicleService.SearchVehicles(GarageData);
+            VehicleService.ParkVehicle(GarageData);
             break;
           case 3:
+            VehicleService.SearchVehicles(GarageData);
+            break;
+          case 4:
             Environment.Exit(0);
             break;
         }

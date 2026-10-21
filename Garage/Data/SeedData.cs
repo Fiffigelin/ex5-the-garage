@@ -34,5 +34,5 @@ public class VehicleSeedItem
   public int NumberOfEngines { get; set; }
 
   // Airplane
-  public int NumberOfPassengers { get; }
+  public int NumberOfPassengers { get; set; }
 }
